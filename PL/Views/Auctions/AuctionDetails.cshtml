@@ -1,0 +1,253 @@
+﻿@using BL.DTOs.Comments
+@using BL.Utils.Claims
+@model PL.Models.AuctionDetailViewModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    @*<div class="row">*@
+    <h2 class="row"><a class="row btn btn-default" style="border: 0; background: transparent;" href="@Url.Action("Index")"><i class="glyphicon glyphicon-chevron-left"></i></a>&nbsp;&nbsp;Details</h2>
+
+    @*</div>*@
+
+
+    <div class="container row col-sm-12 top-buffer-large">
+        <div class="col-sm-3">
+            <span class="text">Total views:</span>
+        </div>
+        <div class="col-sm-6  pull-left">
+            @{
+
+                if (Model.Auction.AuctionViews >= 10000)
+                {
+                    <span class="label  label-success">@Model.Auction.AuctionViews)</span>
+                }
+                else
+                {
+                    if (Model.Auction.AuctionViews >= 1000)
+                    {
+                        <span class="label  label-warning">@Model.Auction.AuctionViews</span>
+                    }
+                    else
+                    {
+                        <span class="label  label-danger">@Model.Auction.AuctionViews</span>
+                    }
+                }
+            }
+        </div>
+    </div>
+    <div class="container row col-sm-12 top-buffer-small">
+        <div class="col-sm-3">
+            <span class="text">Category:</span>
+        </div>
+        <div class="col-sm-6  pull-left">@Model.Category.Name</div>
+    </div>
+    <div class="container row col-sm-12 top-buffer-small">
+        <div class="col-sm-3">
+            <span class="text">Base price:</span>
+        </div>
+        <div class="col-sm-6  pull-left">@Model.Auction.BasePrice.ToString("N2") €</div>
+    </div>
+    <div class="container row col-sm-12 top-buffer-small">
+        <div class="col-sm-3">
+            <span class="text">Current highest bid:</span>
+        </div>
+        @if (Model.Auction.CurrentPrice == Model.Auction.MinPrice)
+        {
+            <div class="col-sm-6  pull-left">0.00 €</div>
+        }
+        else
+        {
+            <div class="col-sm-6  pull-left">@Model.Auction.CurrentPrice.ToString("N2") €</div>
+        }
+    </div>
+
+    @if (Model.Auction.Ended)
+    {
+        <div class="row col-sm-12 top-buffer-large">
+            <div class="col-sm-3">
+                <p>&nbsp;</p>
+            </div>
+            <div class="col-sm-3">
+                <input type="button" class="btn btn-danger disabled" value="Auction ended" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row col-sm-12 top-buffer-large">
+            <div class="col-sm-3">
+                <strong class="text">Minimum next bid:</strong>
+            </div>
+            <div class="col-sm-6">
+                <strong class="text">Custom bid:</strong>
+            </div>
+            <div class="col-sm-3">
+                <strong class="text">One click buy price:</strong>
+            </div>
+
+        </div>
+        <div class="row col-sm-12 top-buffer-small">
+            <div class="col-sm-3">
+                <input type="button" class="btn btn-success" value="@Model.Auction.MinPrice.ToString("N2") €" onclick="location.href = '@Url.Action("Bid", "Auctions", new {id = Model.Auction.ID, bid = Model.Auction.MinPrice})'" />
+            </div>
+            @using (Html.BeginForm("BidCustom", "Auctions", FormMethod.Post))
+            {
+                <div class="form-group col-sm-3">
+                    @Html.HiddenFor(x => x.Auction.ID)
+                    @Html.EditorFor(model => model.Bid, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Bid, "", new { @class = "text-danger" })
+                    @Html.ValidationMessage("model.Bid", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-sm-3">
+                    <input type="submit" id="btnSubmit" class="btn btn-default" value="Create bid" />
+                </div>
+            }
+
+            <div class="col-sm-3">
+                <input type="button" class="btn btn-warning" value="@Model.Auction.OneClickPrice.ToString("N2") €" onclick="location.href = '@Url.Action("Buy", "Auctions", new {id = Model.Auction.ID, bid = Model.Auction.OneClickPrice})'" />
+            </div>
+        </div>
+    }
+
+
+
+    <div class="panel panel-default col-md-12 col-sm-12 col-xs-12 top-buffer-large">
+        <div class="panel-heading panel-head list-group row">
+            <strong>Included items:</strong>
+        </div>
+
+
+        @{foreach (var item in Model.Items)
+            {
+                <div class="col-md-3 col-sm-4 col-xs-6 list-group-item-nonclickable thumbnail">
+                    <div class="col-md-12  col-sm-12 col-xs-12 clickable-area" onclick="location.href = '@Url.Action("Details", "Items", new {id = item.Item.ID})'">
+                        <div class="col-md-12  col-sm-12 col-xs-12">
+                            <div class="row text-center">
+                                @if (item.Images == null || item.Images.Count == 0 || item.Images.All(x => string.IsNullOrEmpty(x.ImagePath)))
+                                {
+                                    <img src="~/Content/Images/nopreview.png" class="img-responsive imageClip" />
+                                }
+                                else
+                                {
+                                    <img id="preview" src="@Url.Content(item.Images.FirstOrDefault(x => !string.IsNullOrEmpty(x.ImagePath))?.ImagePath ?? "unknown")" class="img-responsive imageClip">
+                                }
+
+                            </div>
+                            <div class="caption text-center">
+                                <h4 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="thumbnail-label">@item.Item.Name</h4>
+                            </div>
+                        </div>
+                        <p style="height: 80px; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: normal; text-align: justify;">@item.Item.Description</p>
+                    </div>
+                </div>
+            }}
+    </div>
+
+    <div class="panel panel-default col-md-12 col-sm-12 col-xs-12 top-buffer-large">
+        <div class="panel-heading panel-head list-group row">
+            <strong>Comments:</strong>
+            <input type="button" class="btn btn-success col-sm-offset-10" value="Create comment" onclick="location.href = '@Url.Action("CreateComment", "Comments", new {auctionId = Model.Auction.ID})'" />
+        </div>
+
+        @foreach (CommentDTO comment in Model.Comments)
+        {
+            if (comment.HasParent)
+            {
+                continue;
+            }
+            <ul>
+                <li>
+                    @using (Html.BeginForm("DeleteComment", "Comments", new { auctionId = Model.Auction.ID, id = comment.ID }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken();
+                        <div class="col-md-12 col-sm-12 col-xs-12 list-group-item-nonclickable thumbnail" style="background-color: burlywood">
+                            <div>
+                                <div class="text-left col-md-6 row">
+                                    <span>Author: </span>
+                                    <strong>@comment.AuthorName</strong>
+                                </div>
+                                <div class="text-right">
+                                    <span>Time: </span>
+                                    <strong>@comment.Time</strong>
+                                    @if (User.Identity.IsAuthenticated && User.IsInRole(Claims.Admin))
+                                    {
+
+                                        <a href="#/" onclick="$(this).closest('form').submit();" class="text-right btn btn-small" style="float: right; margin-right: 0; margin-left: 0; color: red; padding: 0">
+                                            <i class="btn-icon-only glyphicon glyphicon-remove"></i>
+                                        </a>
+
+                                    }
+                                    <a href="@Url.Action("CreateComment", "Comments", new {auctionId = Model.Auction.ID, parentId = comment.ID})" class="text-right btn btn-small" style="float: right; margin-right: 0; margin-left: 20px; color: darkviolet; padding: 0"><i style="transform: scaleX(-1);" class="btn-icon-only glyphicon glyphicon-share-alt"></i></a>
+                                </div>
+                                <div>
+                                    <div class="top-buffer-large col-md-12">
+                                        <p>@comment.Text</p>
+                                    </div>
+                                    @*                            <div class="col-md-2 top-buffer-large">*@
+                                    @*                                <input type="button" class="btn btn-default col-sm-offset-10" value="Reply" onclick="location.href = '@Url.Action("CreateComment", "Comments", new {auctionId = Model.Auction.ID, parentId = comment.ID})'"/>*@
+                                    @*                                *@
+                                    @*                            </div>*@
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+                    @foreach (CommentDTO childComment in Model.Comments)
+                    {
+                        if (!childComment.HasParent || childComment.ParentId != comment.ID)
+                        {
+                            continue;
+                        }
+                        <ul>
+                            <li>
+                                @using (Html.BeginForm("DeleteComment", "Comments", new { auctionId = Model.Auction.ID, id = childComment.ID }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken();
+                                    <div class="col-md-12 col-sm-12 col-xs-12 list-group-item-nonclickable thumbnail">
+                                        <div>
+                                            <div class="text-left col-md-6 row">
+                                                <span>Author: </span>
+                                                <strong>@childComment.AuthorName</strong>
+                                            </div>
+                                            <div class="text-right">
+                                                <span>Time: </span>
+                                                <strong>@childComment.Time</strong>
+                                                @if (User.Identity.IsAuthenticated && User.IsInRole(Claims.Admin))
+                                                {
+                                                    <a href="#/" onclick="$(this).closest('form').submit()" class="text-right btn btn-small" style="float: right; margin-right: 0; margin-left: 20px; color: red; padding: 0">
+                                                        <i class="btn-icon-only glyphicon glyphicon-remove"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                            <div>
+                                                <div class="top-buffer-large col-md-12">
+                                                    <p>@childComment.Text</p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+
+                            </li>
+                        </ul>
+
+                    }
+
+                </li>
+            </ul>
+
+        }
+
+
+    </div>
+
+</div>

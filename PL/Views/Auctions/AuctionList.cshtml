@@ -1,0 +1,211 @@
+﻿@using System.Runtime.InteropServices
+@using BL.Utils.Claims
+@using X.PagedList.Mvc
+@model PL.Models.AuctionListViewModel
+
+@{
+    ViewBag.Title = "AuctionListView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+@*    @Styles.Render("~/Content/css/tree.css")*@
+@*    @Styles.Render("~/Content/css/PagedList.css")*@
+    @Styles.Render("~/Content/themes/base/jquery-ui.css")
+}
+
+<div class="panel panel-primary col-md-3 col-sm-4 col-xs-12">
+    <div class="panel-heading panel-head">Categories</div>
+    @using (Html.BeginForm())
+    {
+
+        <div class="tree panel-body">
+            @for (var i = 0; i < Model.Categories.Count; i++)
+            {
+                <ul>
+                    <li>
+                        <a href="#/">
+                            @Html.CheckBoxFor(model => model.Categories[i].IsActive, new { id = Model.Categories[i].ID })
+                            @Html.HiddenFor(model => model.Categories[i].ID)
+                            @Html.HiddenFor(model => model.Categories[i].Name)
+                            <label for="@Model.Categories[i].ID">
+                                @Html.DisplayFor(model => model.Categories[i].Name)
+                            </label>
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+
+        <div class="form-group text-center">
+            <b>
+                Price: <span id="spanOutput"></span>
+            </b>
+            <div id="slider" class="col-md-8 col-md-offset-2"></div>
+            <input id="txtMin" type="hidden" name="Filter.MinPrice" />
+            <input id="txtMax" type="hidden" name="Filter.MaxPrice" />
+        </div>
+        <br />
+
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.Filter.OnlyCurrentAuctions, "Currently Open", new { @class = "control-label col-md-4" })
+            <div class="col-md-5 col-md-offset-3">
+                @Html.CheckBoxFor(model => model.Filter.OnlyCurrentAuctions, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filter.OnlyCurrentAuctions, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.Filter.StartDate, "Ends After", new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Filter.StartDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filter.StartDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.Filter.EndDate, "Ends Before", new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Filter.EndDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filter.EndDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.Filter.SortCriteria, "Sort by:", new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.DropDownListFor(model => model.Filter.SortCriteria, Model.AllSortCriteria, "Select...", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Filter.SortCriteria, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.Filter.SortAscending, "Ascending", new { @class = "control-label col-md-4" })
+            <div class="col-md-5 col-md-offset-3">
+                @Html.CheckBoxFor(model => model.Filter.SortAscending, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filter.SortAscending, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div>
+                <input type="button" class="btn btn-danger  col-md-offset-1 col-md-4" value="Clear" onclick="resetRange(); location.href = '@Url.Action("ClearFilter", "Auctions")';" />
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success col-md-offset-1 col-md-5" id="btnSubmit" type="submit" onclick="saveRange()">Filter </button>
+            </div>
+        </div>
+
+    }
+
+    <div class="col-md-12">
+        @Html.PagedListPager(Model.Auctions, page => Url.Action("Index", new { page }))
+    </div>
+
+
+</div>
+
+<div class="panel panel-default col-md-9 col-sm-8 col-xs-12">
+    <div class="panel-heading panel-head list-group">
+        <strong>Available auctions:</strong>
+        @if (User.Identity.IsAuthenticated && User.IsInRole(Claims.Authenticated))
+        {
+            <input type="button" class="btn btn-success col-sm-offset-6 col-xs-offset-9 col-md-offset-8" style="margin-right: 0;" value="Create new" onclick="location.href = '@Url.Action("CreateAuction", "Auctions")'" />
+        }
+    </div>
+
+    @{foreach (var auction in Model.Auctions)
+        {
+            <div class="col-md-4 col-sm-6 col-xs-12 list-group-item-nonclickable thumbnail" style="width: 274px; height: 500px;">
+
+                <div class="col-md-12  col-sm-12 col-xs-12 clickable-area" @("onclick=GoToDetail('" + auction.ID + "')")>
+
+                    @if (auction.AuctionViews >= 10000)
+                    {
+                        <span class="label  label-success label-pill">@auction.AuctionViews</span>
+                    }
+                    else
+                    {
+                        if (auction.AuctionViews >= 1000)
+                        {
+                            <span class="label  label-warning label-pill">@auction.AuctionViews</span>
+                        }
+                        else
+                        {
+                            <span class="label  label-danger label-pill">@auction.AuctionViews</span>
+                        }
+                    }
+
+                    <div class="row text-center">
+                        @if (auction.CoverImagePath == null)
+                        {
+                            <img style="max-width: 264px; max-height: 264px; display: block; margin: 0 auto;" src="~/Content/Images/nopreview.png" class="img-responsive imageClip" />
+                        }
+                        else
+                        {
+                            <img  style="max-width: 264px; max-height: 264px; display: block; margin: 0 auto;" src="@Url.Content(auction.CoverImagePath)" class="img-responsive imageClip">
+                        }
+
+                    </div>
+                    <div class="caption text-center">
+                        @if (auction.Ended)
+                        {
+                            <h4 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="thumbnail-label">Ended</h4>
+                        }
+                        else
+                        {
+                            <h4 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="thumbnail-label">@auction.AuctionEnd.Subtract(DateTime.Now).ToString(@"d\d\ hh\h\ mm\m\ ss\s")</h4>
+                        }
+                    </div>
+
+                    @{
+                        <div class="row container">
+                            <div class="col-md-12">
+                                <div>
+                                    <span>Base price:</span>
+                                    <strong class="text-primary">@auction.BasePrice.ToString("N2") €</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div>
+                                    <span>Highest bid:</span>
+                                    <strong class="text-primary">@((auction.CurrentPrice == auction.MinPrice ? 0m : auction.CurrentPrice).ToString("N2")) €</strong>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <br />
+                </div>
+                
+                <div class="row text-center">
+                    @if (!auction.Ended)
+                    {
+                        <p>
+                            <input type="button" class="btn btn-primary" value="@auction.MinPrice.ToString("N2") €" onclick="location.href = '@Url.Action("Bid", "Auctions", new {id = auction.ID, bid= auction.MinPrice})'" /> @{/*TODO: change this to support text input*/}
+                        </p>
+                        <p>
+                            <input type="button" class="btn btn-warning" value="@auction.OneClickPrice.ToString("N2") €" onclick="location.href = '@Url.Action("Buy", "Auctions", new {id = auction.ID, bid = auction.OneClickPrice})'" /> @{/*TODO: change this to support text input*/}
+                        </p>
+                    }
+                    else
+                    {
+                        <input type="button" class="btn btn-danger disabled" value="Not available" />
+                    }
+                    
+                </div>
+            </div>
+                        }}
+</div>
+
+<script>
+    function GoToDetail(id) {
+        window.location = "/Auctions/Details/" + id;
+    }
+</script>
+
+@section scripts{
+    @Scripts.Render("~/Scripts/tree.js")
+    @Scripts.Render("~/Scripts/jquery-ui-1.12.1.js")
+    @Scripts.Render("~/Scripts/slider.js")
+}

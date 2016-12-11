@@ -1,0 +1,49 @@
+﻿@model PL.Models.DeliveryCreateViewModel
+
+@{
+    ViewBag.Title = "Create delivery";
+}
+
+<h2 class="row"><a class="row btn btn-default" style="border: 0; background: transparent;" href="@Url.Action("ListBought")"><i class="glyphicon glyphicon-chevron-left"></i></a>&nbsp;&nbsp;Create delivery</h2>
+
+@using (Html.BeginForm("CreateDelivery", "AuctionsManagment", FormMethod.Post))
+{
+    @Html.HiddenFor(model=>model.AuctionId)
+    @Html.HiddenFor(model=>model.BuyerId)
+    @Html.HiddenFor(model=>model.SellerId)
+
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(model => model.DeliveryAddress, "Delivery address", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DeliveryAddress, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DeliveryAddress, "", new { @class = "text-danger" })
+            </div>
+        </div>
+       
+        <div class="form-group">
+            @Html.LabelFor(model => model.DeliveryTypesList, "Delivery type", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.DeliveryType, Model.DeliveryTypesList, "Select delivery type:", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DeliveryType, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.PaymentMethodsList, "Payment method", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.PaymentMethod, Model.PaymentMethodsList, "Select payment method:", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.PaymentMethod, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="row">
+            <br />
+        </div>
+        <div class="row form-group top-buffer-large">
+            <div class="col-md-offset-2 col-md-3">
+                <input class="btn btn-success" name="command" type="submit" value="Create" />
+            </div>
+        </div>
+    </div>
+}

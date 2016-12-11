@@ -1,0 +1,111 @@
+﻿@using BL.Utils.Claims
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Auction portal</title>
+    @RenderSection("head", required: false)
+
+    @*    <link rel="stylesheet" href="~/Content/PagedList.css" />*@
+    @*    <link rel="stylesheet" href="~/Content/tree.css" />*@
+    @*    <link rel="stylesheet" href="~/Content/bootstrap.css" />*@
+    @*    <link rel="stylesheet" href="~/Content/site.css" />*@
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="~/Content/style.css" />
+    <link rel="stylesheet" href="~/Content/dashboard.css" />
+
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Auction Portal", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li>@Html.ActionLink("Auctions", "Index", "Auctions")</li>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole(Claims.Admin))
+                    {
+                        <li>@Html.ActionLink("Users", "List", "Users")</li>
+                    }
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="dropdown pull-right">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user grey" style="margin-right: 5px;"></span> @User.Identity.Name.Split('@')[0] <b class="caret grey"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header">Account management</li>
+                                <li class="divider"></li>
+                                <li>@Html.ActionLink("Logout", "Logout", "Account")</li>
+                            </ul>
+                        </li>
+                        if (User.IsInRole(Claims.Authenticated))
+                        {
+                            <li class="dropdown pull-right">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-star grey" style="margin-right: 5px;"></span>My auctions<b class="caret grey"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-header">Auctions management</li>
+                                    <li class="divider"></li>
+                                    <li>@Html.ActionLink("My auctions", "ListCreated", "AuctionsManagment")</li>
+                                    <li class="divider"></li>
+                                    <li>@Html.ActionLink("My bids", "ListBought", "AuctionsManagment")</li>
+                                </ul>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="dropdown pull-right">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user grey"></span><b class="caret grey"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header">Get started</li>
+                                <li class="divider"></li>
+                                <li>@Html.ActionLink("Register", "Register", "Account")</li>
+                                <li class="divider"></li>
+                                <li>@Html.ActionLink("Log in", "Login", "Account")</li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @if (TempData["Message"] != null || TempData["MessageTitle"] != null)
+        {
+            <div class="alert alert-success">
+                @*            <button class="close" type="button" data-dismiss="alert">×</button>*@
+                <strong>@TempData["MessageTitle"]</strong>&nbsp;@TempData["Message"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null || TempData["ErrorMessageTitle"] != null)
+        {
+            <div class="alert alert-danger">
+                @*            <button class="close" type="button" data-dismiss="alert">×</button>*@
+                <strong>@TempData["ErrorMessageTitle"]</strong>&nbsp;@TempData["ErrorMessage"]
+            </div>
+        }
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Auction Portal by Tobias Kamenicky</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,51 @@
+﻿@model PL.Models.DeliveryDetailsViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2 class="row"><a class="row btn btn-default" style="border: 0; background: transparent;" href="@Url.Action("ListBought")"><i class="glyphicon glyphicon-chevron-left"></i></a>&nbsp;&nbsp;Details</h2>
+
+<hr />
+<dl class="dl-horizontal">
+    <dt>
+        Seller
+    </dt>
+
+    <dd>
+        <a href="@Url.Action("Details", "Users", new {id = Model.Seller.ID})">@(Model.Seller.FirstName + " "+Model.Seller.LastName)</a>
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Delivery.DeliveryAddress)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Delivery.DeliveryAddress)
+    </dd>
+    
+    <dt>
+        @Html.DisplayNameFor(model => model.Delivery.DeliveryType)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Delivery.DeliveryType)
+    </dd>
+    
+    <dt>
+        @Html.DisplayNameFor(model => model.Delivery.PaymentMethod)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Delivery.PaymentMethod)
+    </dd>
+    
+    <dt>
+        @Html.DisplayNameFor(model => model.Delivery.DeliveryStatus)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Delivery.DeliveryStatus)
+    </dd>
+
+</dl>

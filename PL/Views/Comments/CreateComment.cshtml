@@ -1,0 +1,26 @@
+﻿@model BL.DTOs.Comments.CommentCreateDTO
+
+@{
+    ViewBag.Title = "Create comment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create comment</h2>
+@using (Html.BeginForm())
+{
+<div class="col-md-12 top-buffer-large">
+    <div class="form-group">
+        @Html.LabelFor(x => x.Text, new { @class = "control-label" })
+        <div>
+            @Html.TextAreaFor(x => x.Text, new { @class = "form-control top-buffer-small" })
+            @Html.ValidationMessageFor(x => x.Text, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    
+    <div class="form-group">
+        @Html.HiddenFor(x=>x.AuctionId)
+        @Html.HiddenFor(x=>x.ParentId)
+        <button class="btn btn-success" type="submit">Comment</button>
+    </div>
+</div>
+}

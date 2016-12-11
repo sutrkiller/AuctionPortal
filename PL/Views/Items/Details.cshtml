@@ -1,0 +1,32 @@
+﻿@model PL.Models.ItemViewModel
+
+@{
+    ViewBag.Title = "Item details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2 class="row"><a class="row btn btn-default" style="border: 0; background: transparent;" href="@Url.Action("Details","Auctions", new { id = Model.Item.AuctionId })"><i class="glyphicon glyphicon-chevron-left"></i></a>&nbsp;&nbsp;@Model.Item.Name</h2>
+@*<h2>@Model.Item.Name</h2>*@
+<div>
+    <div class="col-md-12 top-buffer-large">
+        <p class="col-md-12 text-justify">@Model.Item.Description</p>
+    </div>
+
+    <div class="panel panel-default col-md-12 col-sm-12 col-xs-12 top-buffer-large">
+        <div class="panel-heading panel-head list-group row">
+            <strong>Images:</strong>
+        </div>
+
+
+        @{foreach (var image in Model.Images)
+        {
+            <div class="col-md-3 col-sm-4 col-xs-6 list-group-item-nonclickable thumbnail">
+                <div class="col-md-12  col-sm-12 col-xs-12">
+                    <img id="preview" src="@Url.Content(image.ImagePath)" class="img-responsive imageClip" alt="Image_@image.ID" width="320" height="320">
+                </div>
+            </div>
+        }}
+    </div>
+    
+@*    <button class="btn btn-default" type="button" onclick="location.href = '@Url.Action("Details","Auctions",new {id=Model.Item.AuctionId})'">Back to auction</button>*@
+</div>
+

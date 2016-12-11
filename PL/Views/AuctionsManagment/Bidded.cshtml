@@ -1,0 +1,108 @@
+﻿@using X.PagedList.Mvc
+@model PL.Models.MyAuctionsViewModel
+
+@{
+    ViewBag.Title = "Bidded auctions";
+}
+
+<h2>Bidded auctions</h2>
+
+<div class="widget widget-table action-table">
+    <div class="widget-header">
+
+        <h3 style="margin-top: 0 !important;"><i style="margin-right: 10px; margin-left: 5px;" class="glyphicon glyphicon-th-list"></i>Auctions</h3>
+    </div>
+    <!-- /widget-header -->
+    <div class="widget-content">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th class="td-actions"></th>
+                    <th>@Html.LabelFor(model => model.Auctions.FirstOrDefault().AuctionStart, "Auction start")</th>
+                    <th>@Html.LabelFor(model => model.Auctions.FirstOrDefault().AuctionEnd, "Auction end")</th>
+                    <th>@Html.LabelFor(model => model.Auctions.FirstOrDefault().BasePrice, "Base price")</th>
+                    <th>@Html.LabelFor(model => model.Auctions.FirstOrDefault().CurrentPrice, "Current highest bid")</th>
+                    <th>@Html.Label("My bid")</th>
+                    <th>@Html.LabelFor(model => model.Auctions.FirstOrDefault().MinPrice, "Minimum bid")</th>
+                    <th class="td-actions">@Html.Label("Delivery")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var auction in Model.Auctions)
+                {
+
+                    <tr style="background: @(auction.Ended ? (Model.UserBids[auction.ID].Value < auction.CurrentPrice ? "darksalmon" : "palegreen") : "transparent");">
+                        <td style="vertical-align: middle;">
+                            <a href="@Url.Action("Details","Auctions",new {id = auction.ID})">Details</a>
+                        </td>
+                        <td style="vertical-align: middle;">
+                            <span>@auction.AuctionStart.ToString("MM/dd/yyyy hh:mm:ss")</span>
+                        </td>
+                        <td style="vertical-align: middle;">
+                            <span>@auction.AuctionEnd.ToString("MM/dd/yyyy hh:mm:ss")</span>
+                        </td>
+                        <td style="vertical-align: middle;">
+                            <span>@auction.BasePrice.ToString("N2") €</span>
+                        </td>
+                        <td style="vertical-align: middle;">
+                            @if (auction.CurrentPrice == auction.MinPrice)
+                            {
+                                <span>0.00 €</span>
+                            }
+                            else
+                            {
+                                <span>@auction.CurrentPrice.ToString("N2") €</span>
+                            }
+                        </td>
+                        <td style="background: @(!auction.Ended && Model.UserBids[auction.ID].Value < auction.CurrentPrice ? "tomato" : "transparent"); vertical-align: middle;">
+                            <span>@Model.UserBids[auction.ID].Value.ToString("N2") €</span>
+                        </td>
+                        <td style="vertical-align: middle;">
+                            @if (!auction.Ended && Model.UserBids[auction.ID].Value < auction.CurrentPrice)
+                            {
+                                using (Html.BeginForm("Bid", "Auctions", new {id = auction.ID, bid = auction.MinPrice}))
+                                {
+                                    <span>@auction.MinPrice.ToString("N2") €</span>
+                                    <button type="submit" class="glyphicon glyphicon-arrow-up" style="border: 0; background: transparent;"></button>
+                                }
+                            }
+                            else
+                            {
+                                <span>@auction.MinPrice.ToString("N2") €</span>
+                            }
+                        </td>
+                        <td class="td-actions" style="vertical-align: middle;">
+                            @if (!auction.Ended)
+                            {
+                                <span>Not&nbsp;ended&nbsp;yet</span>
+                            }
+                            else
+                            {
+                                if (Model.Deliveries[auction.ID] == null)
+                                {
+                                    <a href="@Url.Action("RequestDelivery", new {id = auction.ID})" class="btn glyphicon glyphicon-shopping-cart" style="padding: 0;"></a>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("DeliveryDetails",new {id = Model.Deliveries[auction.ID].ID})" class="btn" style="padding: 0; vertical-align: middle;">@Model.Deliveries[auction.ID].DeliveryStatus.ToString()</a>
+                                }
+                            }
+                            @*                            @using (Html.BeginForm("Delete", "Users", new { id = user.ID }, FormMethod.Post))*@
+                            @*                            {*@
+                            @*                                @Html.AntiForgeryToken()*@
+                            @*                                <button type="submit" class="btn-small btn-danger" style="margin-left: 1em;">*@
+                            @*                                    <i class="glyphicon glyphicon-minus"></i>*@
+                            @*                                </button>*@
+                            @*                            }*@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <!-- /widget-content -->
+</div>
+
+<div class="col-md-12">
+    @Html.PagedListPager(Model.Auctions, page => Url.Action("ListBought", new { page }))
+</div>

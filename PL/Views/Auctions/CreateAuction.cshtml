@@ -1,0 +1,142 @@
+﻿@model PL.Models.AuctionCreateViewModel
+
+@{
+    ViewBag.Title = "Create auction";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="row"><a class="row btn btn-default" style="border: 0; background: transparent;" href="@Url.Action("Index")"><i class="glyphicon glyphicon-chevron-left"></i></a>&nbsp;&nbsp;Create auction</h2>
+
+@using (Html.BeginForm("CreateAuction", "Auctions", FormMethod.Post, new { id = "auctionForm", enctype = "multipart/form-data" }))
+{
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(model => model.BasePrice, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.BasePrice, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.BasePrice, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AuctionEnd, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AuctionEnd, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.AuctionEnd, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Categories, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.CategoryId, Model.Categories, "Select category:", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Categories, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PaymentMethods, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.ListBoxFor(model => model.PaymentMethods, Model.PaymentMethodsList, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.PaymentMethods, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DeliveryTypes, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.ListBoxFor(model => model.DeliveryTypes, Model.DeliveryTypesList, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DeliveryTypes, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="panel panel-default col-md-offset-2 top-buffer-large">
+            <ul class="panel-heading panel-head list-group">Items:</ul>
+
+            
+
+            <div class="col-md-4 col-sm-6 col-xs-12 list-group-item">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ItemName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-12">
+                        @Html.EditorFor(model => model.ItemName, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-12">
+                        @Html.ValidationMessageFor(model => model.ItemName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ItemDescription, new { @class = "control-label col-md-3" })
+                    <div class="col-md-12">
+                        @Html.TextAreaFor(model => model.ItemDescription, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-12">
+                        @Html.ValidationMessageFor(model => model.ItemDescription, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-2">Upload images:</label>
+                    <div class="col-md-12">
+                        <input id="fileInput" name="fileInput" type="file" accept="image/*" multiple class="file-loading">
+                    </div>
+                    <div class="col-md-12">
+                        @Html.ValidationMessage("model.Images", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @for (int i = 0; i < Model.Items.Count; ++i)
+                    {
+                        @Html.HiddenFor(x => x.Items[i].Name)
+                        @Html.HiddenFor(x => x.Items[i].Description)
+                        for (int j = 0; j < Model.Items[i].Images?.Count; ++j)
+                        {
+                            @Html.HiddenFor(x => x.Items[i].Images[j])
+                        }
+                    }
+                </div>
+
+                <div class="row form-group top-buffer-small">
+                    <div class="col-md-offset-2 col-md-3">
+                        <input class="btn btn-success" name="command" type="submit" value="Add item" />
+                    </div>
+                </div>
+            </div>
+            
+            @for (int i = 0; i < Model.Items.Count;++i)
+            {
+                <div class="col-md-4 col-sm-6 col-xs-12 list-group-item">
+                    <div class="col-md-12  col-sm-12 col-xs-12">
+                        <div class="col-md-12  col-sm-12 col-xs-12">
+                            <div class="caption text-center">
+                                <h4 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="thumbnail-label">@Model.Items[i].Name</h4>
+                            </div>
+                            <div class="row">
+                                <span>Number of images:</span>
+                                <strong>@(Model.Items[i].Images?.Count ?? 0)</strong>
+                            </div>
+                        </div>
+                        <p style="margin-top: 20px; height: 80px; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: normal; text-align: justify;">@Model.Items[i].Description</p>
+                    </div>
+                    <div class="form-group top-buffer-small row">
+                        <div class="col-md-3 col-md-offset-2">
+                            <button type="submit" class="btn btn-danger" name="command" value="@i">Remove item</button>
+                        </div>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+        <div class="row">
+            <br />
+        </div>
+        <div class="row form-group top-buffer-large">
+            <div class="col-md-offset-2 col-md-3">
+                <input class="btn btn-success" name="command" type="submit" value="Create" />
+            </div>
+        </div>
+    </div>
+}
