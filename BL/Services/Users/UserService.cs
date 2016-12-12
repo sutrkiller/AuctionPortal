@@ -122,7 +122,7 @@ namespace BL.Services.Users
                     userClaims.Add(new Claim(ClaimTypes.Role, Claims.Authenticated));
                 }
 
-                var account = _userAccountService.CreateAccount(null, userRegistration.Password, userRegistration.Email, (Guid?)null, null);
+                var account = _userAccountService.CreateAccount(string.Join("",userRegistration.Email.TakeWhile(x=>x!='@')), userRegistration.Password, userRegistration.Email, (Guid?)null, null);
 
                 Mapper.Map(userRegistration, account);
 

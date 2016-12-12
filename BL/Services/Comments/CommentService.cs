@@ -32,7 +32,7 @@ namespace BL.Services.Comments
 
         #endregion
 
-        public int CommentsPageSize => 20;
+        public int CommentsPageSize => 5;
 
         public void CreateComment(CommentCreateDTO commentDTO)
         {
@@ -140,9 +140,16 @@ namespace BL.Services.Comments
                 var query = _commentListQuery;
                 query.ClearSortCriterias();
                 query.Filter = filter;
-                query.Skip = Math.Max(0, requiredPage - 1)*CommentsPageSize;
-                query.Take = CommentsPageSize;
-
+                if (requiredPage > 0)
+                {
+                    query.Skip = Math.Max(0, requiredPage - 1)*CommentsPageSize;
+                    query.Take = CommentsPageSize;
+                }
+                else
+                {
+                    query.Skip = null;
+                    query.Take = null;
+                }
                 query.AddSortCriteria(nameof(Comment.Time),SortDirection.Descending);
 
                 return new CommentListQueryResultDTO()

@@ -9,9 +9,11 @@ using System.Web.Mvc;
 using BL.DTOs.Auctions;
 using BL.DTOs.Bids;
 using BL.DTOs.Categories;
+using BL.DTOs.Comments;
 using BL.DTOs.Filters;
 using BL.DTOs.ItemImages;
 using BL.DTOs.Items;
+using BL.DTOs.Users;
 using BL.Facades;
 using BL.Utils.Claims;
 using BL.Utils.Enums;
@@ -35,11 +37,11 @@ namespace PL.Controllers
         /// <returns>view</returns>
         public ActionResult Index(int page = 1)
         {
-            var filter = Session[_filterSesssionKey] as AuctionFilter ?? new AuctionFilter {SortCriteria = AuctionSortCriteria.AuctionEnd};
+            var filter = Session[_filterSesssionKey] as AuctionFilter ?? new AuctionFilter { SortCriteria = AuctionSortCriteria.AuctionEnd };
             var categories = Session[_categoryTreesSessionKey] as IList<CategoryDTO>;
 
             var result = AuctionFacade.GetAuctions(filter, page);
-           // result.ResultPage = result.ResultPage.Where(x => !x.Ended).Concat(result.ResultPage.Where(x => x.Ended));
+            // result.ResultPage = result.ResultPage.Where(x => !x.Ended).Concat(result.ResultPage.Where(x => x.Ended));
 
             var model = InitializeAuctionListViewModel(result, categories);
 
@@ -88,26 +90,28 @@ namespace PL.Controllers
         /// Display details of single auction
         /// </summary>
         /// <param name="id">Id of auction to display</param>
+        /// <param name="page">Comments page</param>
         /// <returns></returns>
-        public ActionResult Details(long id)
+        public ActionResult Details(long id, int page = 1)
         {
             var model = AuctionFacade.GetAuction(id);
             var category = AuctionFacade.GetCategory(model.CategoryId);
             var items = AuctionFacade.GetItemsForAuction(model.ID);
             var itemViews =
-                items.Select(i => new ItemViewModel() {Item = i, Images = AuctionFacade.GetImagesForItem(i.ID).ToList()})
+                items.Select(i => new ItemViewModel() { Item = i, Images = AuctionFacade.GetImagesForItem(i.ID).ToList() })
                     .ToList();
-            var comments =
-                AuctionFacade.GetComments(new CommentFilter() {AuctionId = model.ID})
-                    .ResultPage.OrderBy(x => x.Time)
-                    .ToList();
+
+            var parComms = AuctionFacade.GetComments(new CommentFilter {AuctionId = model.ID, OnlyParent = true}, page);
+            var childComms = parComms.ResultPage.SelectMany(
+                x => AuctionFacade.GetComments(new CommentFilter {AuctionId = model.ID, ParentId = x.ID},0).ResultPage.OrderBy(c=>c.Time));
             var detail = new AuctionDetailViewModel()
             {
                 Auction = model,
+                Author = UserFacade.GetUser(model.SellerId),
                 Category = category,
                 Items = itemViews,
                 Bid = model.MinPrice,
-                Comments = comments
+                Comments = new StaticPagedList<CommentDTO>(parComms.ResultPage.Concat(childComms),page,AuctionFacade.CommentsPageSize,parComms.TotalResultCount)
             };
 
             return View("AuctionDetails", detail);
@@ -129,10 +133,10 @@ namespace PL.Controllers
             CreateBid(model.Auction.ID, model.Bid, out success);
             if (!success)
             {
-                ModelState.AddModelError("model.Bid", (string) TempData["ErrorMessage"]);
+                ModelState.AddModelError("model.Bid", (string)TempData["ErrorMessage"]);
                 return Details(model.Auction.ID);
             }
-            return RedirectToAction("ListBought","AuctionsManagment");
+            return RedirectToAction("ListBought", "AuctionsManagment");
         }
 
         /// <summary>
@@ -145,10 +149,10 @@ namespace PL.Controllers
         public ActionResult Bid(long id, decimal bid)
         {
             bool success;
-            return CreateBid(id, bid,out success);
+            return CreateBid(id, bid, out success);
         }
 
-        private ActionResult CreateBid(long auctionId, decimal bid, out bool success )
+        private ActionResult CreateBid(long auctionId, decimal bid, out bool success)
         {
             success = false;
             var user = UserFacade.GetUser(User.Identity);
@@ -182,7 +186,7 @@ namespace PL.Controllers
                     TempData["ErrorMessage"] = ex.Message;
                 }
             }
-            return RedirectToAction("ListBought","AuctionsManagment");
+            return RedirectToAction("ListBought", "AuctionsManagment");
         }
 
         /// <summary>
@@ -195,10 +199,10 @@ namespace PL.Controllers
         public ActionResult Buy(long id, decimal bid)
         {
             bool success;
-            var result = CreateBid(id, bid,out success);
+            var result = CreateBid(id, bid, out success);
             if (success)
             {
-               // AuctionFacade.OnAuctionEnd(id);
+                // AuctionFacade.OnAuctionEnd(id);
             }
             return result;
         }
@@ -374,11 +378,13 @@ namespace PL.Controllers
         private AuctionListViewModel InitializeAuctionListViewModel(AuctionListQueryResultDTO result,
             IList<CategoryDTO> categories = null)
         {
+            var users = result.ResultPage.ToDictionary(auctionDto => auctionDto.ID, auctionDto => UserFacade.GetUser(auctionDto.SellerId));
             return new AuctionListViewModel
             {
                 Auctions = new StaticPagedList<AuctionDTO>(result.ResultPage, result.RequestedPage, AuctionFacade.AuctionsPageSize, result.TotalResultCount),
                 Categories = categories ?? AuctionFacade.GetAllCategories() as IList<CategoryDTO>,
-                Filter = result.Filter
+                Filter = result.Filter,
+                AuctionAuthors = users
             };
         }
 

@@ -1,5 +1,6 @@
 ﻿@using BL.DTOs.Comments
 @using BL.Utils.Claims
+@using X.PagedList.Mvc
 @model PL.Models.AuctionDetailViewModel
 
 @{
@@ -17,24 +18,24 @@
 
     <div class="container row col-sm-12 top-buffer-large">
         <div class="col-sm-3">
-            <span class="text">Total views:</span>
+            <strong class="text">Total views:</strong>
         </div>
         <div class="col-sm-6  pull-left">
             @{
 
                 if (Model.Auction.AuctionViews >= 10000)
                 {
-                    <span class="label  label-success">@Model.Auction.AuctionViews)</span>
+                    <strong class="label  label-success">@Model.Auction.AuctionViews)</strong>
                 }
                 else
                 {
                     if (Model.Auction.AuctionViews >= 1000)
                     {
-                        <span class="label  label-warning">@Model.Auction.AuctionViews</span>
+                        <strong class="label  label-warning">@Model.Auction.AuctionViews</strong>
                     }
                     else
                     {
-                        <span class="label  label-danger">@Model.Auction.AuctionViews</span>
+                        <strong class="label  label-danger">@Model.Auction.AuctionViews</strong>
                     }
                 }
             }
@@ -42,19 +43,25 @@
     </div>
     <div class="container row col-sm-12 top-buffer-small">
         <div class="col-sm-3">
-            <span class="text">Category:</span>
+            <strong class="text">Author:</strong>
+        </div>
+        <div class="col-sm-6  pull-left">@(Model.Author.FirstName + " " + Model.Author.LastName)</div>
+    </div>
+    <div class="container row col-sm-12 top-buffer-small">
+        <div class="col-sm-3">
+            <strong class="text">Category:</strong>
         </div>
         <div class="col-sm-6  pull-left">@Model.Category.Name</div>
     </div>
     <div class="container row col-sm-12 top-buffer-small">
         <div class="col-sm-3">
-            <span class="text">Base price:</span>
+            <strong class="text">Base price:</strong>
         </div>
         <div class="col-sm-6  pull-left">@Model.Auction.BasePrice.ToString("N2") €</div>
     </div>
     <div class="container row col-sm-12 top-buffer-small">
         <div class="col-sm-3">
-            <span class="text">Current highest bid:</span>
+            <strong class="text">Current highest bid:</strong>
         </div>
         @if (Model.Auction.CurrentPrice == Model.Auction.MinPrice)
         {
@@ -153,14 +160,14 @@
             <strong>Comments:</strong>
             <input type="button" class="btn btn-success col-sm-offset-10" value="Create comment" onclick="location.href = '@Url.Action("CreateComment", "Comments", new {auctionId = Model.Auction.ID})'" />
         </div>
-
-        @foreach (CommentDTO comment in Model.Comments)
-        {
-            if (comment.HasParent)
+        <ul style="list-style: none;">
+            @foreach (CommentDTO comment in Model.Comments)
             {
-                continue;
-            }
-            <ul>
+                if (comment.HasParent)
+                {
+                    continue;
+                }
+
                 <li>
                     @using (Html.BeginForm("DeleteComment", "Comments", new { auctionId = Model.Auction.ID, id = comment.ID }, FormMethod.Post))
                     {
@@ -198,14 +205,14 @@
                         </div>
                     }
 
-
-                    @foreach (CommentDTO childComment in Model.Comments)
-                    {
-                        if (!childComment.HasParent || childComment.ParentId != comment.ID)
+                    <ul style="list-style: none;">
+                        @foreach (CommentDTO childComment in Model.Comments)
                         {
-                            continue;
-                        }
-                        <ul>
+                            if (!childComment.HasParent || childComment.ParentId != comment.ID)
+                            {
+                                continue;
+                            }
+
                             <li>
                                 @using (Html.BeginForm("DeleteComment", "Comments", new { auctionId = Model.Auction.ID, id = childComment.ID }, FormMethod.Post))
                                 {
@@ -235,19 +242,16 @@
                                         </div>
                                     </div>
                                 }
-
-
                             </li>
-                        </ul>
-
-                    }
-
+                        }
+                    </ul>
                 </li>
-            </ul>
-
-        }
-
-
+            }
+        </ul>
+        
+        <div class="col-md-12">
+            @Html.PagedListPager(Model.Comments, page => Url.Action("Details", new { page }))
+        </div>
     </div>
 
 </div>

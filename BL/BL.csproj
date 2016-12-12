@@ -99,6 +99,7 @@
     <Compile Include="AppInfrastructure\AppUnitOfWork.cs" />
     <Compile Include="AppInfrastructure\AppUnitOfWorkProvider.cs" />
     <Compile Include="Bootstrap\BusinessLayerInstaller.cs" />
+    <Compile Include="Bootstrap\DataInit.cs" />
     <Compile Include="Bootstrap\MappingInit.cs" />
     <Compile Include="Bootstrap\UserAccountInit.cs" />
     <Compile Include="DTOs\Auctions\AuctionCreateDTO.cs" />

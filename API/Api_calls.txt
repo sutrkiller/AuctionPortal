@@ -1,0 +1,75 @@
+﻿All auctions: http://localhost:18381/api/Auction/
+Current auctions: http://localhost:18381/api/Auction/Current
+Specific auction: http://localhost:18381/api/Auction/2
+Specific auction: http://localhost:18381/api/Auction/User/3
+Post auction: http://localhost:18381/api/Auction/
+Post data: 
+{
+    "SellerId": 2,
+    "CategoryId": 1,
+    "AuctionStart": "2016-12-05T13:38:08.3434417",
+    "AuctionEnd": "2016-12-16T14:58:08.3434417",
+    "BasePrice": 2500,
+    "DeliveryOptionsSerialized": "0;1",
+    "PaymentOptionsSerialized": "1"
+ }
+ Delete auction: http://localhost:18381/api/Auction/?id=3
+
+ Post bid: http://localhost:18381/api/Bid/
+ {
+    "AuctionId": 1,
+    "BidderId": 2,
+    "Value": 2500
+ }
+ Get auctoin bids: http://localhost:18381/api/Bid/Auction/1
+ 
+ 
+ Auctions data:
+[
+  {
+    "ID": 1,
+    "SellerId": 3,
+    "CategoryId": 1,
+    "AuctionStart": "2016-12-05T13:38:08.3434417",
+    "AuctionEnd": "2016-12-12T13:58:08.3434417",
+    "BasePrice": 2000,
+    "AuctionViews": 0,
+    "DeliveryOptionsSerialized": "1",
+    "PaymentOptionsSerialized": "0;2",
+    "CoverImagePath": "~\\Content\\Images\\Tmp\\nexus5x_2.jpg",
+    "MinPrice": 2000,
+    "OneClickPrice": 200000,
+    "DeliveryOptions": [
+      1
+    ],
+    "PaymentOptions": [
+      0,
+      2
+    ],
+    "Ended": false,
+    "CurrentPrice": 2000
+  },
+  {
+    "ID": 2,
+    "SellerId": 3,
+    "CategoryId": 2,
+    "AuctionStart": "2016-12-07T13:38:08.5741213",
+    "AuctionEnd": "2016-12-11T13:38:08.5741213",
+    "BasePrice": 3000,
+    "AuctionViews": 0,
+    "DeliveryOptionsSerialized": "1;0",
+    "PaymentOptionsSerialized": "1",
+    "CoverImagePath": "~\\Content\\Images\\Tmp\\csharpbook.jpg",
+    "MinPrice": 3000,
+    "OneClickPrice": 300000,
+    "DeliveryOptions": [
+      1,
+      0
+    ],
+    "PaymentOptions": [
+      1
+    ],
+    "Ended": true,
+    "CurrentPrice": 3000
+  }
+]

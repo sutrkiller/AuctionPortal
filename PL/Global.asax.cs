@@ -39,7 +39,7 @@ namespace PL
             MappingInit.ConfigureMapping();
 
             UserAccountInit.InitializeUserAccounts(_container);
-
+            DataInit.InitializeDb(_container);
             var controllerFactory = new WindsorControllerFactory(_container.Kernel);
             ControllerBuilder.Current.SetControllerFactory(controllerFactory);
         }

@@ -137,7 +137,7 @@
                         }
                     }
 
-                    <div class="row text-center">
+                    <div class="row text-center" style="height: 264px;">
                         @if (auction.CoverImagePath == null)
                         {
                             <img style="max-width: 264px; max-height: 264px; display: block; margin: 0 auto;" src="~/Content/Images/nopreview.png" class="img-responsive imageClip" />
@@ -161,6 +161,12 @@
 
                     @{
                         <div class="row container">
+                            <div class="col-md-12">
+                                <div>
+                                    <span>Author:</span>
+                                    <strong class="text-primary">@(Model.AuctionAuthors[auction.ID]==null ? "Unknown" : Model.AuctionAuthors[auction.ID].FirstName+" "+ Model.AuctionAuthors[auction.ID].LastName)</strong>
+                                </div>
+                            </div>
                             <div class="col-md-12">
                                 <div>
                                     <span>Base price:</span>

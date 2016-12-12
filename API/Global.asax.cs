@@ -18,14 +18,19 @@ namespace API
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
 
+            
             BootstrapContainer();
-            MappingInit.ConfigureMapping();
+            
         }
 
         private void BootstrapContainer()
         {
             _container.Install(new WebApiInstaller(), new BusinessLayerInstaller());
             GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerActivator),new WindsorCompositionRoot(_container));
+
+            MappingInit.ConfigureMapping();
+            UserAccountInit.InitializeUserAccounts(_container);
+            DataInit.InitializeDb(_container);
         }
 
         public override void Dispose()

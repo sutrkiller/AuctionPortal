@@ -37,6 +37,10 @@ namespace BL.Queries
             {
                 query = query.Where(q => q.ParentComment != null && q.ParentComment.ID == Filter.ParentId);
             }
+            if (Filter.OnlyParent)
+            {
+                query = query.Where(x => x.ParentComment == null);
+            }
             if (!string.IsNullOrEmpty(Filter.Text))
             {
                 query = query.Where(q => q.Text.Contains(Filter.Text));

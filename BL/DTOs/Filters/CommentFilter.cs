@@ -7,5 +7,6 @@
         public long AuthorId { get; set; }
         public long? ParentId { get; set; }
         public string Text { get; set; }
+        public bool OnlyParent { get; set; }
     }
 }
