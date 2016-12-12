@@ -75,7 +75,7 @@ namespace BL.Services.Auctions
         {
             using (var uow = UnitOfWorkProvider.Create())
             {
-                var auction = _auctionRepository.GetById(auctionId, a => a.Category, a => a.Seller, a => a.Bids, a => a.Comments, a => a.Items,a=>a.Items.Select(x=>x.ItemImages));
+                var auction = _auctionRepository.GetById(auctionId, a => a.Category, a => a.Seller, a => a.Bids, a => a.Comments, a => a.Items, a => a.Items.Select(x => x.ItemImages));
                 if (auction == null) return null;
                 if (increaseViews)
                 {
@@ -105,7 +105,7 @@ namespace BL.Services.Auctions
             {
                 var auction = GetAuction(auctionId, false);
 
-                var bids = GetBids(new BidFilter() {AuctionId = auctionId}).TotalResultCount;
+                var bids = GetBids(new BidFilter() { AuctionId = auctionId }).TotalResultCount;
                 //var auction = GetAuctionById(auctionId);
                 return bids == 0 ? auction.BasePrice : decimal.Multiply(auction.CurrentPrice, 1 + new decimal(MinBidRisePercentage / 100));
             }
@@ -129,7 +129,7 @@ namespace BL.Services.Auctions
                 var list = _auctionListQuery;
                 list.Filter = filter;
                 var result = list.GetFiltered();
-                var ordered = result.OrderBy(x => (x.AuctionEnd < DateTime.Now || x.CurrentPrice >= x.BasePrice*new decimal(OneClickBuyMultiplier)) ? 1 : 0);
+                var ordered = result.OrderBy(x => (x.AuctionEnd < DateTime.Now || x.CurrentPrice >= x.BasePrice * new decimal(OneClickBuyMultiplier)) ? 1 : 0);
                 switch (filter.SortCriteria)
                 {
                     case AuctionSortCriteria.AuctionStart:
@@ -144,7 +144,7 @@ namespace BL.Services.Auctions
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                result = ordered.Skip(Math.Max(0, requiredPage - 1)*AuctionsPageSize).Take(AuctionsPageSize);
+                result = ordered.Skip(Math.Max(0, requiredPage - 1) * AuctionsPageSize).Take(AuctionsPageSize);
 
                 return new AuctionListQueryResultDTO()
                 {
@@ -152,29 +152,6 @@ namespace BL.Services.Auctions
                     ResultPage = result.ToList(),
                     RequestedPage = requiredPage,
                     TotalResultCount = ordered.Count()
-                };
-                
-
-
-
-
-                var query = _auctionListQuery;
-                query.ClearSortCriterias();
-                query.Filter = filter;
-                query.Skip = Math.Max(0, requiredPage - 1) * AuctionsPageSize;
-                query.Take = AuctionsPageSize;
-
-
-                var sortOrder = filter.SortAscending ? SortDirection.Ascending : SortDirection.Descending;
-               
-                query.AddSortCriteria(filter.SortCriteria.ToString(), sortOrder);
-
-                return  new AuctionListQueryResultDTO()
-                {
-                    RequestedPage = requiredPage,
-                    TotalResultCount = query.GetTotalRowCount(),
-                    ResultPage = query.Execute(),
-                    Filter = filter
                 };
             }
         }

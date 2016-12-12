@@ -61,34 +61,4 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://lessonpv226.visualstudio.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = DAL\\DAL.csproj
-		SccProjectName1 = DAL
-		SccLocalPath1 = DAL
-		SccProjectUniqueName2 = Autentization\\Autentization.csproj
-		SccProjectName2 = Autentization
-		SccLocalPath2 = Autentization
-		SccProjectUniqueName3 = Riganti.Utils.Infrastructure.Core\\Riganti.Utils.Infrastructure.Core.csproj
-		SccProjectName3 = Riganti.Utils.Infrastructure.Core
-		SccLocalPath3 = Riganti.Utils.Infrastructure.Core
-		SccProjectUniqueName4 = Riganti.Utils.Infrastructure.EntityFramework\\Riganti.Utils.Infrastructure.EntityFramework.csproj
-		SccProjectName4 = Riganti.Utils.Infrastructure.EntityFramework
-		SccLocalPath4 = Riganti.Utils.Infrastructure.EntityFramework
-		SccProjectUniqueName5 = BL\\BL.csproj
-		SccProjectName5 = BL
-		SccLocalPath5 = BL
-		SccProjectUniqueName6 = TestingApp\\TestingApp.csproj
-		SccProjectName6 = TestingApp
-		SccLocalPath6 = TestingApp
-		SccProjectUniqueName7 = API\\API.csproj
-		SccProjectName7 = API
-		SccLocalPath7 = API
-		SccProjectUniqueName8 = PL\\PL.csproj
-		SccProjectName8 = PL
-		SccLocalPath8 = PL
-	EndGlobalSection
 EndGlobal
