@@ -8,6 +8,7 @@
 <h2>Create comment</h2>
 @using (Html.BeginForm())
 {
+    @Html.HiddenFor(model=>model.ReturnPage)
 <div class="col-md-12 top-buffer-large">
     <div class="form-group">
         @Html.LabelFor(x => x.Text, new { @class = "control-label" })

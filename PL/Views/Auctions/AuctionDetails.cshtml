@@ -189,7 +189,7 @@
                                         </a>
 
                                     }
-                                    <a href="@Url.Action("CreateComment", "Comments", new {auctionId = Model.Auction.ID, parentId = comment.ID})" class="text-right btn btn-small" style="float: right; margin-right: 0; margin-left: 20px; color: darkviolet; padding: 0"><i style="transform: scaleX(-1);" class="btn-icon-only glyphicon glyphicon-share-alt"></i></a>
+                                    <a href="@Url.Action("CreateComment", "Comments", new {auctionId = Model.Auction.ID, parentId = comment.ID, returnPage = Model.Comments.PageNumber})" class="text-right btn btn-small" style="float: right; margin-right: 0; margin-left: 20px; color: darkviolet; padding: 0"><i style="transform: scaleX(-1);" class="btn-icon-only glyphicon glyphicon-share-alt"></i></a>
                                 </div>
                                 <div>
                                     <div class="top-buffer-large col-md-12">

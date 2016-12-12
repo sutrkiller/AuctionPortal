@@ -22,5 +22,6 @@ namespace BL.DTOs.Comments
         [Required]
         public DateTime Time { get; set; }
         public bool HasParent => ParentId != null;
+        public long ReturnPage { get; set; }
     }
 }

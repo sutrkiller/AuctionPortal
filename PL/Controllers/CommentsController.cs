@@ -13,12 +13,13 @@ namespace PL.Controllers
         public AuctionFacade AuctionFacade { get; set; }
         public UserFacade UserFacade { get; set; }
 
-        public ActionResult CreateComment(long auctionId, long? parentId)
+        public ActionResult CreateComment(long auctionId, long? parentId, long returnPage = 1)
         {
             var model = new CommentCreateDTO()
             {
                 AuctionId = auctionId,
-                ParentId = parentId
+                ParentId = parentId,
+                ReturnPage = returnPage
             };
 
             return View("CreateComment", model);
@@ -44,7 +45,7 @@ namespace PL.Controllers
             try
             {
                 AuctionFacade.CreateComment(model);
-                return RedirectToAction("Details", "Auctions", new {id = model.AuctionId});
+                return RedirectToAction("Details", "Auctions", new {id = model.AuctionId, page = model.ReturnPage});
             }
             catch (FormatException ex)
             {
@@ -58,7 +59,7 @@ namespace PL.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Claims.Admin)]
-        public ActionResult DeleteComment(long auctionId, long id)
+        public ActionResult DeleteComment(long auctionId, long id, int returnPage = 1)
         {
             try
             {
@@ -75,7 +76,7 @@ namespace PL.Controllers
                 TempData["ErrorMessageTitle"] = "Deletion failed: ";
                 TempData["ErrorMessage"] = ex.Message;
             }
-            return RedirectToAction("Details", "Auctions", new {id = auctionId});
+            return RedirectToAction("Details", "Auctions", new {id = auctionId, page = returnPage});
         }
     }
 }
