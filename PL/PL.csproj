@@ -353,7 +353,6 @@
     <None Include="Views\AuctionsManagment\Created.cshtml" />
     <None Include="Views\AuctionsManagment\CreateDelivery.cshtml" />
     <None Include="Views\AuctionsManagment\DeliveryDetails.cshtml" />
-    <Content Include="Views\AuctionsManagment\Detail.cshtml" />
     <None Include="Views\AuctionsManagment\EditDelivery.cshtml" />
     <None Include="Views\Auctions\AuctionDetails.cshtml" />
     <None Include="Views\Auctions\AuctionList.cshtml" />

@@ -13,9 +13,15 @@
     </dt>
 
     <dd>
-        <a href="@Url.Action("Details", "Users", new {id = Model.Seller.ID})">@(Model.Seller.FirstName + " "+Model.Seller.LastName)</a>
+        <span>@(Model.Seller.FirstName + " " + Model.Seller.LastName)</span>
     </dd>
+    <dt>
+        Contact to seller
+    </dt>
 
+    <dd>
+        <span>@Model.Seller.Email</span>
+    </dd>
     <dt>
         @Html.DisplayNameFor(model => model.Delivery.DeliveryAddress)
     </dt>

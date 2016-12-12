@@ -209,6 +209,7 @@ namespace PL.Controllers
                     Id = delivery.ID,
                     BuyerId = delivery.BuyerId,
                     BuyerName = user.FirstName + " " + user.LastName,
+                    BuyerEmail = user.Email,
                     DeliveryType = delivery.DeliveryType.ToString(),
                     PaymentMethod = delivery.PaymentMethod.ToString(),
                     DeliveryAddress = delivery.DeliveryAddress,
@@ -225,6 +226,7 @@ namespace PL.Controllers
             }
         }
 
+        [HttpPost]
         public ActionResult EditDelivery(DeliveryEditViewModel model)
         {
             try
@@ -248,7 +250,7 @@ namespace PL.Controllers
             {
                 TempData["ErrorMessage"] = "Editing failed";
             }
-            RedirectToAction("ListCreated");
+            return RedirectToAction("ListCreated");
         }
     }
 }

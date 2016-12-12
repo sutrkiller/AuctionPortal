@@ -19,7 +19,14 @@
         <div class="form-group">
             @Html.LabelFor(model => model.BuyerName, "Buyer", new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <a href="@Url.Action("Details", "Users", new {id = Model.BuyerId})" class="form-control" style="width: 280px;">@Model.BuyerName</a>
+                <span class="form-control" style="width: 280px;">@Model.BuyerName</span>
+            </div>
+        </div>
+      
+        <div class="form-group">
+            @Html.LabelFor(model => model.BuyerEmail, "Contact to buyer", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control" style="width: 280px;">@Model.BuyerEmail</span>
             </div>
         </div>
         

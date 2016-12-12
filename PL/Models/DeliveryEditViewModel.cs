@@ -15,6 +15,8 @@ namespace PL.Models
         public long BuyerId { get; set; }
         [DisplayName("Buyer")]
         public string BuyerName { get; set; }
+        [DisplayName("Contact to buyer")]
+        public string BuyerEmail { get; set; }
         [DisplayName("Delivery address")]
         public string DeliveryAddress { get; set; }
         [DisplayName("Delivery type")]

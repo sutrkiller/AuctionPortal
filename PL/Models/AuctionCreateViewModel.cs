@@ -16,7 +16,7 @@ namespace PL.Models
         public long CategoryId { get; set; }
         [DisplayName("Category")]
         public SelectList Categories { get; set; }
-        [Required, DataType(DataType.DateTime), DisplayName("Auction end")]
+        [Required, DataType(DataType.DateTime), DisplayFormat(DataFormatString = "{0:MM/dd/yyyy hh:mm:ss}",ApplyFormatInEditMode = true), DisplayName("Auction end")]
         public DateTime AuctionEnd { get; set; }
         [Required, DataType(DataType.Currency), DisplayName("Base price")]
         public decimal BasePrice { get; set; }
