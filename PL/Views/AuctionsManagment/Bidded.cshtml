@@ -82,7 +82,7 @@
                                 {
                                     <a href="@Url.Action("RequestDelivery", new {id = auction.ID})" class="btn glyphicon glyphicon-shopping-cart" style="padding: 0;"></a>
                                 }
-                                else
+                                else if (Model.UserBids[auction.ID].Value == auction.CurrentPrice)
                                 {
                                     <a href="@Url.Action("DeliveryDetails",new {id = Model.Deliveries[auction.ID].ID})" class="btn" style="padding: 0; vertical-align: middle;">@Model.Deliveries[auction.ID].DeliveryStatus.ToString()</a>
                                 }

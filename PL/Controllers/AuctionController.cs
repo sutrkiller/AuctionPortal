@@ -37,7 +37,8 @@ namespace PL.Controllers
         /// <returns>view</returns>
         public ActionResult Index(int page = 1)
         {
-            var filter = Session[_filterSesssionKey] as AuctionFilter ?? new AuctionFilter { SortCriteria = AuctionSortCriteria.AuctionEnd };
+            var filter = Session[_filterSesssionKey] as AuctionFilter ??
+                         new AuctionFilter {SortCriteria = AuctionSortCriteria.AuctionEnd};
             var categories = Session[_categoryTreesSessionKey] as IList<CategoryDTO>;
 
             var result = AuctionFacade.GetAuctions(filter, page);
@@ -98,12 +99,14 @@ namespace PL.Controllers
             var category = AuctionFacade.GetCategory(model.CategoryId);
             var items = AuctionFacade.GetItemsForAuction(model.ID);
             var itemViews =
-                items.Select(i => new ItemViewModel() { Item = i, Images = AuctionFacade.GetImagesForItem(i.ID).ToList() })
+                items.Select(i => new ItemViewModel() {Item = i, Images = AuctionFacade.GetImagesForItem(i.ID).ToList()})
                     .ToList();
 
             var parComms = AuctionFacade.GetComments(new CommentFilter {AuctionId = model.ID, OnlyParent = true}, page);
             var childComms = parComms.ResultPage.SelectMany(
-                x => AuctionFacade.GetComments(new CommentFilter {AuctionId = model.ID, ParentId = x.ID},0).ResultPage.OrderBy(c=>c.Time));
+                x =>
+                    AuctionFacade.GetComments(new CommentFilter {AuctionId = model.ID, ParentId = x.ID}, 0)
+                        .ResultPage.OrderBy(c => c.Time));
             var detail = new AuctionDetailViewModel()
             {
                 Auction = model,
@@ -111,7 +114,9 @@ namespace PL.Controllers
                 Category = category,
                 Items = itemViews,
                 Bid = model.MinPrice,
-                Comments = new StaticPagedList<CommentDTO>(parComms.ResultPage.Concat(childComms),page,AuctionFacade.CommentsPageSize,parComms.TotalResultCount)
+                Comments =
+                    new StaticPagedList<CommentDTO>(parComms.ResultPage.Concat(childComms), page,
+                        AuctionFacade.CommentsPageSize, parComms.TotalResultCount)
             };
 
             return View("AuctionDetails", detail);
@@ -133,7 +138,7 @@ namespace PL.Controllers
             CreateBid(model.Auction.ID, model.Bid, out success);
             if (!success)
             {
-                ModelState.AddModelError("model.Bid", (string)TempData["ErrorMessage"]);
+                ModelState.AddModelError("model.Bid", (string) TempData["ErrorMessage"]);
                 return Details(model.Auction.ID);
             }
             return RedirectToAction("ListBought", "AuctionsManagment");
@@ -162,7 +167,7 @@ namespace PL.Controllers
                 return RedirectToAction("ListBought", "AuctionsManagment");
             }
             var userId = user.ID;
-            var bidDto = new BidDTO() { AuctionId = auctionId, BidderId = userId, Value = bid };
+            var bidDto = new BidDTO() {AuctionId = auctionId, BidderId = userId, Value = bid};
 
             var auction = AuctionFacade.GetAuction(auctionId);
             if (auction.SellerId == userId)
@@ -284,7 +289,7 @@ namespace PL.Controllers
             }
 
             ModelState.Remove(nameof(AuctionCreateViewModel.ItemName));
-            if (!ModelState.IsValid || model.BasePrice <= 0)
+            if (!ModelState.IsValid || model.BasePrice <= 0 || DateTime.Parse(model.AuctionEnd.ToString("O"))<=DateTime.Parse(DateTime.Now.ToString("O")))
             {
                 if (model.CategoryId == 0)
                 {
@@ -293,6 +298,10 @@ namespace PL.Controllers
                 if (model.BasePrice <= 0)
                 {
                     ModelState.AddModelError(nameof(model.BasePrice), @"Price must be a positive value.");
+                }
+                if (DateTime.Parse(model.AuctionEnd.ToString("O")) <= DateTime.Parse(DateTime.Now.ToString("O")))
+                {
+                    ModelState.AddModelError(nameof(model.AuctionEnd),@"Time must be in the future.");
                 }
                 return View("CreateAuction", InitializeCreateViewModel(model));
             }
@@ -303,9 +312,9 @@ namespace PL.Controllers
                 BasePrice = model.BasePrice,
                 SellerId = userId.Value,
                 DeliveryOptions =
-                    model.DeliveryTypes.Any() ? model.DeliveryTypes.ToArray() : new[] { DeliveryType.Unknown },
+                    model.DeliveryTypes.Any() ? model.DeliveryTypes.ToArray() : new[] {DeliveryType.Unknown},
                 PaymentOptions =
-                    model.PaymentMethods.Any() ? model.PaymentMethods.ToArray() : new[] { PaymentMethod.Unknown },
+                    model.PaymentMethods.Any() ? model.PaymentMethods.ToArray() : new[] {PaymentMethod.Unknown},
                 CategoryId = model.CategoryId
             };
             var items =
@@ -319,12 +328,21 @@ namespace PL.Controllers
                                     Description = x.Description
                                 },
                                 Images = x.Images?.Select(image => new ItemImageDTO()
-                                {
-                                    ImagePath = image
-                                }).ToList() ?? new List<ItemImageDTO>()
+                                         {
+                                             ImagePath = image
+                                         }).ToList() ?? new List<ItemImageDTO>()
                             })
                     .ToList();
-            AuctionFacade.CreateAuction(dto, items);
+            try
+            {
+                AuctionFacade.CreateAuction(dto, items);
+            }
+            catch (Exception ex)
+            {
+
+                TempData["ErrorMessage"] = ex.Message;
+            }
+            
             return RedirectToAction("Index", "Auctions");
         }
 
